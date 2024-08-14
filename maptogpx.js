@@ -7,11 +7,13 @@
             '<metadata><name>Trail GPX</name><desc>GPX file generated from trail paths</desc><author>Trail Exporter</author></metadata>';
         const gpxFooter = '</gpx>';
         let gpxBody = '';
-
+    
         // Add waypoints (trail markers)
         if (trailMarkers && trailMarkers.length > 0) {
             trailMarkers.forEach(function(marker) {
-                gpxBody += '<wpt lat="' + marker.lat + '" lon="' + marker.lng + '">';
+                // Use 'lng' if it exists, otherwise fall back to 'long'
+                const lng = marker.lng !== undefined ? marker.lng : marker.long;
+                gpxBody += '<wpt lat="' + marker.lat + '" lon="' + lng + '">';
                 gpxBody += '<name>' + (marker.des_plain || 'Waypoint') + '</name>';
                 if (marker.elevation) {
                     gpxBody += '<ele>' + marker.elevation.replace(' m', '') + '</ele>';
@@ -22,7 +24,7 @@
                 gpxBody += '</wpt>';
             });
         }
-
+    
         // Add track segments
         trailPaths.forEach(function(path) {
             let trackName = 'Trail';
@@ -41,7 +43,7 @@
             });
             gpxBody += '</trkseg></trk>';
         });
-
+    
         const gpxContent = gpxHeader + gpxBody + gpxFooter;
         return gpxContent;
     }
