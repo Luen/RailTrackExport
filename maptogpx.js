@@ -65,10 +65,11 @@
         return filename;
     }
 
-    const trailPaths = window.trail_paths;
-    const trailMarkers = window.trail_markers;
+    // Ensure that the correct global variables are used
+    const trailPaths = window.trail_paths || [];
+    const trailMarkers = window.trail_markers || [];
 
-    if (trailPaths) {
+    if (trailPaths.length > 0) {
         const gpxContent = createGPX(trailPaths, trailMarkers);
         const filename = getFilename();
         downloadGPX(gpxContent, filename);
