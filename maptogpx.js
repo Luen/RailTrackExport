@@ -18,7 +18,7 @@
         return gpxContent;
     }
 
-    function downloadGPX(gpxContent, filename = 'trail.gpx') {
+    function downloadGPX(gpxContent, filename) {
         const blob = new Blob([gpxContent], { type: 'application/gpx+xml' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -29,10 +29,20 @@
         document.body.removeChild(link);
     }
 
+    // Get the title from the first h2 tag for the filename
+    function getFilenameFromTitle() {
+        const h2 = document.querySelector('h2');
+        if (h2) {
+            return h2.textContent.trim().replace(/\s+/g, '_') + '.gpx';
+        }
+        return 'trail.gpx';
+    }
+
     const trailPaths = window.trail_paths;
     if (trailPaths) {
         const gpxContent = createGPX(trailPaths);
-        downloadGPX(gpxContent);
+        const filename = getFilenameFromTitle();
+        downloadGPX(gpxContent, filename);
     } else {
         alert("No trail paths found!");
     }
