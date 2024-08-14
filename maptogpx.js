@@ -29,19 +29,27 @@
         document.body.removeChild(link);
     }
 
-    // Get the title from the first h2 tag for the filename
-    function getFilenameFromTitle() {
+    // Get the filename from the first h2 tag, falling back to the title tag
+    function getFilename() {
+        let filename = '';
         const h2 = document.querySelector('h2');
         if (h2) {
-            return h2.textContent.trim().replace(/\s+/g, '_') + '.gpx';
+            filename = h2.textContent.trim();
+        } else {
+            const title = document.querySelector('title');
+            if (title) {
+                filename = title.textContent.trim();
+            }
         }
-        return 'trail.gpx';
+        // Sanitize the filename by replacing spaces with underscores and removing special characters
+        filename = filename.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_\-\.]/g, '') + '.gpx';
+        return filename;
     }
 
     const trailPaths = window.trail_paths;
     if (trailPaths) {
         const gpxContent = createGPX(trailPaths);
-        const filename = getFilenameFromTitle();
+        const filename = getFilename();
         downloadGPX(gpxContent, filename);
     } else {
         alert("No trail paths found!");
