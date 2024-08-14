@@ -1,4 +1,11 @@
 (function() {
+    // Sanitize input to avoid XML parsing issues
+    function sanitizeInput(input) {
+        return input.replace(/[&<>"']/g, function(c) {
+            return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;'}[c];
+        });
+    }
+
     function createGPX(trailPaths, trailMarkers) {
         const gpxHeader = '<?xml version="1.0" encoding="UTF-8"?>' +
             '<gpx version="1.1" creator="Trail GPX Exporter" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
@@ -7,24 +14,29 @@
             '<metadata><name>Trail GPX</name><desc>GPX file generated from trail paths</desc><author>Trail Exporter</author></metadata>';
         const gpxFooter = '</gpx>';
         let gpxBody = '';
-    
+
         // Add waypoints (trail markers)
         if (trailMarkers && trailMarkers.length > 0) {
+            console.log('Trail markers:', trailMarkers); // Debugging: Log trail markers
             trailMarkers.forEach(function(marker) {
-                // Use 'lng' if it exists, otherwise fall back to 'long'
-                const lng = marker.lng !== undefined ? marker.lng : marker.long;
-                gpxBody += '<wpt lat="' + marker.lat + '" lon="' + lng + '">';
-                gpxBody += '<name>' + (marker.des_plain || 'Waypoint') + '</name>';
-                if (marker.elevation) {
-                    gpxBody += '<ele>' + marker.elevation.replace(' m', '') + '</ele>';
+                // Validate marker data
+                if (marker.lat && (marker.lng !== undefined || marker.long !== undefined)) {
+                    const lng = marker.lng !== undefined ? marker.lng : marker.long;
+                    gpxBody += '<wpt lat="' + marker.lat + '" lon="' + lng + '">';
+                    gpxBody += '<name>' + sanitizeInput(marker.des_plain || 'Waypoint') + '</name>';
+                    if (marker.elevation) {
+                        gpxBody += '<ele>' + marker.elevation.replace(' m', '') + '</ele>';
+                    }
+                    if (marker.des) {
+                        gpxBody += '<desc>' + sanitizeInput(marker.des) + '</desc>';
+                    }
+                    gpxBody += '</wpt>';
+                } else {
+                    console.warn('Invalid marker data:', marker); // Debugging: Log invalid markers
                 }
-                if (marker.des) {
-                    gpxBody += '<desc>' + marker.des + '</desc>';
-                }
-                gpxBody += '</wpt>';
             });
         }
-    
+
         // Add track segments
         trailPaths.forEach(function(path) {
             let trackName = 'Trail';
@@ -37,13 +49,13 @@
             } else if (path.type) {
                 trackName = path.type.charAt(0).toUpperCase() + path.type.slice(1);
             }
-            gpxBody += '<trk><name>' + trackName + '</name><trkseg>';
+            gpxBody += '<trk><name>' + sanitizeInput(trackName) + '</name><trkseg>';
             path.data.forEach(function(point) {
                 gpxBody += '<trkpt lat="' + point.lat + '" lon="' + point.lng + '"></trkpt>';
             });
             gpxBody += '</trkseg></trk>';
         });
-    
+
         const gpxContent = gpxHeader + gpxBody + gpxFooter;
         return gpxContent;
     }
