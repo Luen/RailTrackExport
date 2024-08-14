@@ -17,7 +17,6 @@
 
         // Add waypoints (trail markers)
         if (trailMarkers && trailMarkers.length > 0) {
-            console.log('Trail markers:', trailMarkers); // Debugging: Log trail markers
             trailMarkers.forEach(function(marker) {
                 // Validate marker data
                 if (marker.lat && (marker.lng !== undefined || marker.long !== undefined)) {
@@ -32,7 +31,7 @@
                     }
                     gpxBody += '</wpt>';
                 } else {
-                    console.warn('Invalid marker data:', marker); // Debugging: Log invalid markers
+                    console.warn('Invalid marker data:', marker);
                 }
             });
         }
