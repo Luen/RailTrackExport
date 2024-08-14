@@ -25,7 +25,16 @@
 
         // Add track segments
         trailPaths.forEach(function(path) {
-            const trackName = path.type === 'on_road' ? 'Potential Route (Dashed Line)' : (path.type || 'Trail');
+            let trackName = 'Trail';
+            if (path.type === 'on_road') {
+                trackName = 'Potential Route (Dashed Line)';
+            } else if (path.type === 'possible_trail') {
+                trackName = 'Potential Trail';
+            } else if (path.type === 'former_railway') {
+                trackName = 'Former Railway';
+            } else if (path.type) {
+                trackName = path.type.charAt(0).toUpperCase() + path.type.slice(1);
+            }
             gpxBody += '<trk><name>' + trackName + '</name><trkseg>';
             path.data.forEach(function(point) {
                 gpxBody += '<trkpt lat="' + point.lat + '" lon="' + point.lng + '"></trkpt>';
