@@ -1,4 +1,4 @@
-# RailTrackExport
+# Rail Trails Export
 Download the map data from railtrails.org.au as a GPX file.
 
 Create a bookmark with the follow:
