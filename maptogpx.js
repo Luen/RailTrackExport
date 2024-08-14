@@ -1,5 +1,5 @@
 (function() {
-    function createGPX(trailPaths) {
+    function createGPX(trailPaths, trailMarkers) {
         const gpxHeader = '<?xml version="1.0" encoding="UTF-8"?>' +
             '<gpx version="1.1" creator="Trail GPX Exporter" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
             'xmlns="http://www.topografix.com/GPX/1/1" xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" ' +
@@ -7,13 +7,32 @@
             '<metadata><name>Trail GPX</name><desc>GPX file generated from trail paths</desc><author>Trail Exporter</author></metadata>';
         const gpxFooter = '</gpx>';
         let gpxBody = '';
+
+        // Add waypoints (trail markers)
+        if (trailMarkers && trailMarkers.length > 0) {
+            trailMarkers.forEach(function(marker) {
+                gpxBody += '<wpt lat="' + marker.lat + '" lon="' + marker.lng + '">';
+                gpxBody += '<name>' + (marker.des_plain || 'Waypoint') + '</name>';
+                if (marker.elevation) {
+                    gpxBody += '<ele>' + marker.elevation.replace(' m', '') + '</ele>';
+                }
+                if (marker.des) {
+                    gpxBody += '<desc>' + marker.des + '</desc>';
+                }
+                gpxBody += '</wpt>';
+            });
+        }
+
+        // Add track segments
         trailPaths.forEach(function(path) {
-            gpxBody += '<trk><name>' + (path.type || 'Trail') + '</name><trkseg>';
+            const trackName = path.type === 'on_road' ? 'Potential Route (Dashed Line)' : (path.type || 'Trail');
+            gpxBody += '<trk><name>' + trackName + '</name><trkseg>';
             path.data.forEach(function(point) {
                 gpxBody += '<trkpt lat="' + point.lat + '" lon="' + point.lng + '"></trkpt>';
             });
             gpxBody += '</trkseg></trk>';
         });
+
         const gpxContent = gpxHeader + gpxBody + gpxFooter;
         return gpxContent;
     }
@@ -47,8 +66,10 @@
     }
 
     const trailPaths = window.trail_paths;
+    const trailMarkers = window.trail_markers;
+
     if (trailPaths) {
-        const gpxContent = createGPX(trailPaths);
+        const gpxContent = createGPX(trailPaths, trailMarkers);
         const filename = getFilename();
         downloadGPX(gpxContent, filename);
     } else {
