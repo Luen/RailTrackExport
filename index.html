@@ -14,8 +14,18 @@
         header {
             background-color: #333;
             color: #fff;
-            padding: 10px 0;
+            padding: 10px 20px;
             text-align: center;
+            position: relative;
+        }
+        header .github-link {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+        header .github-link img {
+            width: 32px;
+            height: 32px;
         }
         .container {
             padding: 20px;
@@ -53,6 +63,9 @@
 
 <header>
     <h1>Rail Trails GPX Exporter</h1>
+    <a href="https://github.com/Luen/RailTrailsExpor" target="_blank" class="github-link">
+        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub">
+    </a>
 </header>
 
 <div class="container">
@@ -79,7 +92,7 @@
 </div>
 
 <footer>
-    <p>&copy; 2024 Railtrails GPX Exporter | Created by Luen Warneke</p>
+    <p>&copy; 2024 RailTrails GPX Exporter | Created by Luen Warneke</p>
 </footer>
 
 </body>
